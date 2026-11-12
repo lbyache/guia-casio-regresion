@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manual Interactivo TP N° 06 · Correlación y Regresión Lineal · U de la Ciudad</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-[var(--background)] text-[var(--foreground)] antialiased p-4 md:p-8">
+
+  <div class="max-w-6xl mx-auto space-y-8">
+
+    <!-- ===================================================================== -->
+    <!-- ENCABEZADO INSTITUCIONAL U DE LA CIUDAD                               -->
+    <!-- ===================================================================== -->
+    <header class="bg-[var(--card)] border border-[var(--border)] rounded-2xl overflow-hidden shadow-sm">
+      <div class="u-banner px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div>
+          <div class="text-xs font-semibold uppercase tracking-widest opacity-90">
+            Universidad de la Ciudad de Buenos Aires · Fundamentos de Estadística y Probabilidad
+          </div>
+          <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight mt-0.5">
+            Correlación y Regresión Lineal · Trabajo Práctico N° 06
+          </h1>
+        </div>
+        <div class="text-xs md:text-right space-y-0.5 opacity-95 shrink-0">
+          <div class="font-bold">Profesor: Alan Terluc</div>
+          <div>11 de noviembre de 2026</div>
+        </div>
+      </div>
+
+      <!-- Team & Quick Navigation Bar -->
+      <div class="p-5 space-y-4">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 pb-4 border-b border-[var(--border)]">
+          <div class="text-xs text-[var(--muted-foreground)]">
+            <strong class="text-[var(--foreground)]">Integrantes:</strong>
+            Luis Daniel Godoy · Javier López · Walter López · Fabrizio De Rui Sartor · Laura Yachelini
+          </div>
+          <div class="flex flex-wrap gap-2 text-xs">
+            <a href="#sec-calculadora" class="px-3 py-1 rounded-lg bg-[var(--secondary)] text-[var(--secondary-foreground)] font-semibold hover:opacity-90">1. Uso de Calculadora</a>
+            <a href="#sec-manual" class="px-3 py-1 rounded-lg bg-[var(--secondary)] text-[var(--secondary-foreground)] font-semibold hover:opacity-90">2. Desarrollo Manual (Ej. 12)</a>
+            <a href="#sec-prediccion" class="px-3 py-1 rounded-lg bg-[var(--secondary)] text-[var(--secondary-foreground)] font-semibold hover:opacity-90">3. Simulador de Predicciones</a>
+            <a href="#sec-tp6" class="px-3 py-1 rounded-lg bg-[var(--secondary)] text-[var(--secondary-foreground)] font-semibold hover:opacity-90">4. Banco de Ejercicios TP N° 06</a>
+          </div>
+        </div>
+
+        <!-- DATASET & MODEL SELECTOR -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+          <!-- Dataset Switcher (5 cols) -->
+          <div class="lg:col-span-5 space-y-1.5">
+            <div class="text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
+              A. Conjunto de datos en pantalla:
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <button data-click="selectDataset('ej12')" id="ds-ej12" class="dataset-tab-active text-left p-2.5 rounded-xl border border-[var(--border)] bg-[var(--background)] transition">
+                <div class="font-bold text-xs">Ejercicio 12 (TP N° 06)</div>
+                <div class="text-xs opacity-85 font-mono">n=4 · ŷ = 3x · r = 0,9420</div>
+              </button>
+              <button data-click="selectDataset('kaggle')" id="ds-kaggle" class="text-left p-2.5 rounded-xl border border-[var(--border)] bg-[var(--background)] transition">
+                <div class="font-bold text-xs">Caso Práctico (Kaggle)</div>
+                <div class="text-xs opacity-85 font-mono">n=40 · Horas vs. Notas</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Calculator Family Switcher (7 cols) -->
+          <div class="lg:col-span-7 space-y-1.5">
+            <div class="text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
+              B. Modelo de calculadora científica:
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <button data-click="selectModel('classwiz')" id="tab-classwiz" class="model-tab-active text-left p-2.5 rounded-xl border border-[var(--border)] bg-[var(--background)] transition">
+                <div class="font-bold text-xs">ClassWiz (X / EX)</div>
+                <div class="text-xs opacity-85 font-mono">fx-570LA X / 991EX</div>
+              </button>
+              <button data-click="selectModel('esplus')" id="tab-esplus" class="text-left p-2.5 rounded-xl border border-[var(--border)] bg-[var(--background)] transition">
+                <div class="font-bold text-xs">ES / ES PLUS</div>
+                <div class="text-xs opacity-85 font-mono">fx-82ES / 570ES</div>
+              </button>
+              <button data-click="selectModel('ms')" id="tab-ms" class="text-left p-2.5 rounded-xl border border-[var(--border)] bg-[var(--background)] transition">
+                <div class="font-bold text-xs">MS (2 líneas)</div>
+                <div class="text-xs opacity-85 font-mono">fx-82MS / 95MS</div>
+              </button>
+              <button data-click="selectModel('cw')" id="tab-cw" class="text-left p-2.5 rounded-xl border border-[var(--border)] bg-[var(--background)] transition">
+                <div class="font-bold text-xs">ClassWiz CW</div>
+                <div class="text-xs opacity-85 font-mono">fx-991LA CW / 82CW</div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===================================================================== -->
+    <!-- SECCIÓN 1: CALCULADORA INTERACTIVA + 5 PASOS DINÁMICOS                -->
+    <!-- ===================================================================== -->
+    <div id="sec-calculadora" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+      <!-- LEFT COLUMN: 5 ILLUSTRATED STEPS (7 cols) -->
+      <div class="lg:col-span-7 space-y-3.5">
+        <div class="flex items-center justify-between px-1 flex-wrap gap-2">
+          <h2 id="steps-section-title" class="text-sm font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
+            1 · Procedimiento en Casio ClassWiz (fx-570LA X / fx-991EX)
+          </h2>
+          <span id="active-dataset-pill" class="px-2.5 py-0.5 rounded-full text-xs font-bold u-pill">
+            Datos activos: Ejercicio 12 (n = 4)
+          </span>
+        </div>
+
+        <p id="model-header-desc" class="text-xs text-[var(--muted-foreground)] px-1"></p>
+
+        <div id="steps-container" class="space-y-3"></div>
+      </div>
+
+      <!-- RIGHT COLUMN: REALISTIC INTERACTIVE CALCULATOR GRAPHIC (5 cols) -->
+      <div class="lg:col-span-5 lg:sticky lg:top-6">
+        <div id="calc-chassis-box" class="calc-chassis-classwiz rounded-[2.2rem] p-5 text-white max-w-[375px] mx-auto select-none transition-all">
+
+          <!-- TOP CASIO BRANDING -->
+          <div class="flex items-center justify-between px-2 mb-3">
+            <div>
+              <div class="font-black tracking-widest text-lg leading-none text-slate-100">CASIO</div>
+              <div id="calc-model-label" class="text-xs font-semibold text-amber-300 tracking-wide mt-0.5">fx-570LA X</div>
+            </div>
+            <div class="text-right">
+              <div id="calc-series-badge" class="inline-block px-2.5 py-0.5 rounded bg-slate-800 border border-slate-600 text-xs font-bold tracking-widest text-cyan-300">
+                CLASSWIZ
+              </div>
+              <div id="calc-sub-badge" class="text-xs text-slate-400 mt-0.5">Natural-V.P.A.M.</div>
+            </div>
+          </div>
+
+          <!-- LCD DISPLAY BEZEL -->
+          <div class="calc-bezel rounded-2xl p-3 mb-4">
+            <div class="lcd-screen rounded-lg p-3 min-h-[176px] flex flex-col justify-between">
+              <div class="flex items-center justify-between text-xs border-b border-[#7a8c6e] pb-1 mb-1.5 font-bold">
+                <span id="lcd-status">STAT | D</span>
+                <span id="sim-step-badge" class="bg-[#141e12] text-[#d3dec8] px-1.5 py-0.2 rounded text-xs">
+                  PASO 1/5
+                </span>
+              </div>
+
+              <div id="lcd-body" class="my-auto py-1 text-xs"></div>
+
+              <div id="lcd-footer" class="text-xs border-t border-[#7a8c6e] pt-1 mt-1.5 flex justify-between font-semibold opacity-85">
+                <span id="lcd-footer-model">fx-570LA X</span>
+                <span id="lcd-footer-hint">Apretá [MENU]</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- INSTRUCTION CALLOUT ON CALCULATOR -->
+          <div id="calc-action-banner" class="mb-3 px-3 py-2 rounded-xl bg-amber-500/20 border border-amber-400/50 text-amber-200 text-xs font-semibold text-center">
+            Teclas resaltadas para este paso
+          </div>
+
+          <!-- UPPER FUNCTION KEYS + D-PAD -->
+          <div class="grid grid-cols-12 gap-1.5 items-center mb-3 px-1">
+            <div class="col-span-4 grid grid-cols-2 gap-1.5">
+              <div class="text-center">
+                <div class="text-[12px] text-amber-400 font-bold leading-none mb-0.5">SHIFT</div>
+                <button id="key-shift" class="cw-key cw-key-dark w-full h-7 rounded-full text-xs font-bold">SHIFT</button>
+              </div>
+              <div class="text-center">
+                <div id="label-top-left-2" class="text-[12px] text-rose-400 font-bold leading-none mb-0.5">ALPHA</div>
+                <button id="key-alpha" class="cw-key cw-key-dark w-full h-7 rounded-full text-xs font-bold">ALPHA</button>
+              </div>
+              <div class="text-center mt-1">
+                <button data-click="selectStep(4)" id="key-optn" class="cw-key cw-key-dark w-full h-8 rounded-lg text-xs font-bold">OPTN</button>
+              </div>
+              <div class="text-center mt-1">
+                <button id="key-comma" class="cw-key cw-key-dark w-full h-8 rounded-lg text-xs font-bold">,</button>
+              </div>
+            </div>
+
+            <div class="col-span-4 flex justify-center">
+              <div id="key-dpad" class="w-20 h-20 rounded-full bg-gradient-to-b from-slate-300 to-slate-500 border-2 border-slate-600 shadow-inner relative flex items-center justify-center text-slate-900 font-bold text-xs">
+                <button data-click="prevStep()" title="Arriba" class="absolute top-1 left-1/2 -translate-x-1/2 hover:text-blue-700">▲</button>
+                <button data-click="nextStep()" title="Abajo" class="absolute bottom-1 left-1/2 -translate-x-1/2 hover:text-blue-700">▼</button>
+                <button data-click="prevStep()" title="Izquierda" class="absolute left-1.5 top-1/2 -translate-y-1/2 hover:text-blue-700">◀</button>
+                <button data-click="nextStep()" title="Derecha" class="absolute right-1.5 top-1/2 -translate-y-1/2 hover:text-blue-700">▶</button>
+                <div id="key-ok" class="w-7 h-7 rounded-full bg-slate-400/90 border border-slate-600 flex items-center justify-center text-[12px] font-extrabold text-slate-800"></div>
+              </div>
+            </div>
+
+            <div class="col-span-4 grid grid-cols-2 gap-1.5">
+              <div class="text-center">
+                <div id="label-menu-mode" class="text-[12px] text-amber-300 font-bold leading-none mb-0.5">SETUP</div>
+                <button data-click="selectStep(1)" id="key-menu" class="cw-key cw-key-dark w-full h-7 rounded-full text-xs font-bold">MENU</button>
+              </div>
+              <div class="text-center">
+                <div class="text-[12px] text-slate-300 font-bold leading-none mb-0.5">ON</div>
+                <button id="key-on" class="cw-key cw-key-dark w-full h-7 rounded-full text-xs font-bold">ON</button>
+              </div>
+              <div class="text-center mt-1">
+                <button data-click="selectStep(5)" id="key-x2" class="cw-key cw-key-dark w-full h-8 rounded-lg text-xs font-bold">x²</button>
+              </div>
+              <div class="text-center mt-1">
+                <button id="key-mplus" class="cw-key cw-key-dark w-full h-8 rounded-lg text-xs font-bold">M+</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- LOWER NUMERIC & OPERATION KEYPAD -->
+          <div class="grid grid-cols-5 gap-1.5 px-1 pt-2 border-t border-slate-700/80">
+            <button id="key-7" class="cw-key cw-key-num h-9 rounded-lg font-bold text-sm">7</button>
+            <button id="key-8" class="cw-key cw-key-num h-9 rounded-lg font-bold text-sm">8</button>
+            <button id="key-9" class="cw-key cw-key-num h-9 rounded-lg font-bold text-sm">9</button>
+            <button id="key-del" class="cw-key cw-key-blue h-9 rounded-lg font-bold text-xs">DEL</button>
+            <button data-click="selectStep(4)" id="key-ac" class="cw-key cw-key-blue h-9 rounded-lg font-bold text-xs">AC</button>
+
+            <button id="key-4" class="cw-key cw-key-num h-9 rounded-lg font-bold text-sm">4</button>
+            <button id="key-5" class="cw-key cw-key-num h-9 rounded-lg font-bold text-sm">5</button>
+            <button data-click="selectStep(1)" id="key-6" class="cw-key cw-key-num h-9 rounded-lg font-bold text-sm">6</button>
+            <button class="cw-key cw-key-num h-9 rounded-lg font-bold text-sm">×</button>
+            <button class="cw-key cw-key-num h-9 rounded-lg font-bold text-sm">÷</button>
+
+            <div class="relative">
+              <div id="sublabel-key-1" class="hidden -top-2.5 left-0 right-0 text-center text-[12px] text-amber-300 font-bold leading-none">STAT</div>
+              <button id="key-1" class="cw-key cw-key-num w-full h-9 rounded-lg font-bold text-sm">1</button>
+            </div>
+            <div class="relative">
+              <div id="sublabel-key-2" class="hidden -top-2.5 left-0 right-0 text-center text-[12px] text-amber-300 font-bold leading-none">S-VAR</div>
+              <button data-click="selectStep(2)" id="key-2" class="cw-key cw-key-num w-full h-9 rounded-lg font-bold text-sm">2</button>
+            </div>
+            <button data-click="selectStep(4)" id="key-3" class="cw-key cw-key-num h-9 rounded-lg font-bold text-sm">3</button>
+            <button class="cw-key cw-key-num h-9 rounded-lg font-bold text-sm">+</button>
+            <button class="cw-key cw-key-num h-9 rounded-lg font-bold text-sm">−</button>
+
+            <button id="key-0" class="cw-key cw-key-num h-9 rounded-lg font-bold text-sm">0</button>
+            <button class="cw-key cw-key-num h-9 rounded-lg font-bold text-sm">.</button>
+            <button class="cw-key cw-key-num h-9 rounded-lg font-bold text-xs">×10<sup>x</sup></button>
+            <button class="cw-key cw-key-num h-9 rounded-lg font-bold text-xs">Ans</button>
+            <button data-click="nextStep()" id="key-eq" class="cw-key cw-key-num h-9 rounded-lg font-bold text-base">=</button>
+          </div>
+
+          <div class="flex items-center justify-between mt-4 pt-2 border-t border-slate-700/80 text-xs">
+            <button data-click="prevStep()" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold">
+              ← Anterior
+            </button>
+            <button data-click="showSumsInLCD()" class="px-2.5 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-400/40 font-semibold">
+              Ver Σ Sumas
+            </button>
+            <button data-click="nextStep()" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold">
+              Siguiente →
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- TABLA COMPARATIVA RÁPIDA ENTRE LOS 4 MODELOS                          -->
+    <!-- ===================================================================== -->
+    <section class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm space-y-4">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 border-b border-[var(--border)] pb-3">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-[#8f1d70]">
+            Referencia rápida multimodelo
+          </span>
+          <h2 class="text-lg md:text-xl font-bold text-[var(--foreground)]">
+            Secuencia de teclas según la familia de calculadora (clic en una fila para ver en el simulador)
+          </h2>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto rounded-xl border border-[var(--border)]">
+        <table class="w-full text-xs text-left">
+          <thead class="bg-[var(--secondary)] text-[var(--secondary-foreground)] uppercase">
+            <tr>
+              <th class="py-2.5 px-3 border-r border-[var(--border)]">Familia / Modelos</th>
+              <th class="py-2.5 px-3 border-r border-[var(--border)]">1. Entrar a Regresión Lineal</th>
+              <th class="py-2.5 px-3 border-r border-[var(--border)]">2. Cargar pares (x, y)</th>
+              <th class="py-2.5 px-3 border-r border-[var(--border)]">3. Ver A (a), B (b) y r</th>
+              <th class="py-2.5 px-3">4. Ver Sumas (Σx, Σy, Σxy, Σx², Σy²)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[var(--border)] bg-[var(--background)]">
+            <tr tabindex="0" role="button" data-click="selectModel('classwiz')" class="cursor-pointer hover:bg-[var(--secondary)] transition">
+              <td class="py-2.5 px-3 font-bold border-r border-[var(--border)]">
+                Casio ClassWiz (X / EX)<br/>
+                <span class="font-mono font-normal text-[var(--muted-foreground)]">fx-570LA X / fx-991EX / fx-82LA X</span>
+              </td>
+              <td class="py-2.5 px-3 border-r border-[var(--border)]"><code>MENU</code> → <code>6 (Estadística)</code> → <code>2 (y=a+bx)</code></td>
+              <td class="py-2.5 px-3 border-r border-[var(--border)]">Tabla en pantalla: valor + <code>=</code></td>
+              <td class="py-2.5 px-3 border-r border-[var(--border)]"><code>AC</code> → <code>OPTN</code> → <code>4 (Cálculo de regresión)</code></td>
+              <td class="py-2.5 px-3"><code>AC</code> → <code>OPTN</code> → <code>3 (Cálculo de 2 variables)</code></td>
+            </tr>
+            <tr tabindex="0" role="button" data-click="selectModel('esplus')" class="cursor-pointer hover:bg-[var(--secondary)] transition">
+              <td class="py-2.5 px-3 font-bold border-r border-[var(--border)]">
+                Casio ES / ES PLUS<br/>
+                <span class="font-mono font-normal text-[var(--muted-foreground)]">fx-82ES / fx-95ES / fx-570ES Plus</span>
+              </td>
+              <td class="py-2.5 px-3 border-r border-[var(--border)]"><code>MODE</code> → <code>2 o 3 (STAT)</code> → <code>2 (A+BX)</code></td>
+              <td class="py-2.5 px-3 border-r border-[var(--border)]">Tabla en pantalla: valor + <code>=</code></td>
+              <td class="py-2.5 px-3 border-r border-[var(--border)]"><code>AC</code> → <code>SHIFT</code> + <code>1 (STAT)</code> → <code>5 (Reg)</code> → elegir <code>A</code>, <code>B</code> o <code>r</code> + <code>=</code></td>
+              <td class="py-2.5 px-3"><code>AC</code> → <code>SHIFT</code> + <code>1 (STAT)</code> → <code>3 (Sum)</code></td>
+            </tr>
+            <tr tabindex="0" role="button" data-click="selectModel('ms')" class="cursor-pointer hover:bg-[var(--secondary)] transition">
+              <td class="py-2.5 px-3 font-bold border-r border-[var(--border)]">
+                Casio MS (2 líneas)<br/>
+                <span class="font-mono font-normal text-[var(--muted-foreground)]">fx-82MS / fx-95MS / fx-570MS</span>
+              </td>
+              <td class="py-2.5 px-3 border-r border-[var(--border)]"><code>MODE</code> → <code>REG</code> (el número varía según modelo) → <code>1 (Lin)</code></td>
+              <td class="py-2.5 px-3 border-r border-[var(--border)]">Sin tabla: <code>x</code> <code>,</code> <code>y</code> y apretar <code>M+</code> (DT) por cada par</td>
+              <td class="py-2.5 px-3 border-r border-[var(--border)]"><code>SHIFT</code> + <code>2 (S-VAR)</code> → mover con <code>▶</code> hasta ver <code>A</code>, <code>B</code>, <code>r</code> + <code>=</code></td>
+              <td class="py-2.5 px-3"><code>SHIFT</code> + <code>1 (S-SUM)</code> → elegir suma + <code>=</code></td>
+            </tr>
+            <tr tabindex="0" role="button" data-click="selectModel('cw')" class="cursor-pointer hover:bg-[var(--secondary)] transition">
+              <td class="py-2.5 px-3 font-bold border-r border-[var(--border)]">
+                Casio ClassWiz CW<br/>
+                <span class="font-mono font-normal text-[var(--muted-foreground)]">fx-991LA CW / fx-570LA CW / fx-82CW</span>
+              </td>
+              <td class="py-2.5 px-3 border-r border-[var(--border)]"><code>HOME</code> → <code>Estadística</code> → <code>2 variables</code> + <code>OK</code></td>
+              <td class="py-2.5 px-3 border-r border-[var(--border)]">Tabla en pantalla: valor + <code>OK</code> (o <code>EXE</code>)</td>
+              <td class="py-2.5 px-3 border-r border-[var(--border)]"><code>OK</code> → <code>Resultados de regresión</code> → <code>y=a+bx</code></td>
+              <td class="py-2.5 px-3"><code>OK</code> → <code>Resultados de 2 variables</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- SECCIÓN 2: DESARROLLO MANUAL EN 3 PASOS (EJERCICIO 12)                -->
+    <!-- ===================================================================== -->
+    <section id="sec-manual" class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm space-y-6">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 border-b border-[var(--border)] pb-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-[#8f1d70]">
+            2 · Desarrollo manual paso a paso
+          </span>
+          <h2 class="text-xl md:text-2xl font-bold text-[var(--foreground)]">
+            Cálculo en tres pasos: Sumas, Pendiente y Ordenada (Ejercicio 12)
+          </h2>
+        </div>
+        <span class="px-3 py-1 rounded-full u-pill text-xs font-mono font-semibold">
+          Pares: (2, 7), (4, 11), (5, 13), (6, 20) · n = 4
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+
+        <!-- 1. ARMAR LAS SUMAS (5 cols) -->
+        <div class="lg:col-span-5 bg-[var(--background)] border border-[var(--border)] rounded-xl p-4 flex flex-col justify-between space-y-3">
+          <div class="space-y-1">
+            <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#8f1d70]">
+              <span class="w-5 h-5 rounded u-btn-primary inline-flex items-center justify-center">1</span>
+              <span>Armar las sumas (n = 4 pares)</span>
+            </div>
+            <p class="text-xs text-[var(--muted-foreground)]">
+              Tabla completa de sumatorias (incluyendo <code>x·y</code>, <code>x²</code> e <code>y²</code>):
+            </p>
+          </div>
+
+          <div class="overflow-hidden rounded-xl border border-[var(--border)]">
+            <table class="w-full text-sm text-center font-mono">
+              <thead class="bg-[var(--secondary)] text-[var(--secondary-foreground)] text-xs uppercase">
+                <tr>
+                  <th class="py-2 px-2 border-r border-[var(--border)]">x</th>
+                  <th class="py-2 px-2 border-r border-[var(--border)]">y</th>
+                  <th class="py-2 px-2 border-r border-[var(--border)]">x·y</th>
+                  <th class="py-2 px-2 border-r border-[var(--border)]">x²</th>
+                  <th class="py-2 px-2">y²</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-[var(--border)] bg-[var(--card)]">
+                <tr>
+                  <td class="py-1.5 px-2 border-r border-[var(--border)]">2</td>
+                  <td class="py-1.5 px-2 border-r border-[var(--border)]">7</td>
+                  <td class="py-1.5 px-2 border-r border-[var(--border)]">14</td>
+                  <td class="py-1.5 px-2 border-r border-[var(--border)]">4</td>
+                  <td class="py-1.5 px-2">49</td>
+                </tr>
+                <tr>
+                  <td class="py-1.5 px-2 border-r border-[var(--border)]">4</td>
+                  <td class="py-1.5 px-2 border-r border-[var(--border)]">11</td>
+                  <td class="py-1.5 px-2 border-r border-[var(--border)]">44</td>
+                  <td class="py-1.5 px-2 border-r border-[var(--border)]">16</td>
+                  <td class="py-1.5 px-2">121</td>
+                </tr>
+                <tr>
+                  <td class="py-1.5 px-2 border-r border-[var(--border)]">5</td>
+                  <td class="py-1.5 px-2 border-r border-[var(--border)]">13</td>
+                  <td class="py-1.5 px-2 border-r border-[var(--border)]">65</td>
+                  <td class="py-1.5 px-2 border-r border-[var(--border)]">25</td>
+                  <td class="py-1.5 px-2">169</td>
+                </tr>
+                <tr>
+                  <td class="py-1.5 px-2 border-r border-[var(--border)]">6</td>
+                  <td class="py-1.5 px-2 border-r border-[var(--border)]">20</td>
+                  <td class="py-1.5 px-2 border-r border-[var(--border)]">120</td>
+                  <td class="py-1.5 px-2 border-r border-[var(--border)]">36</td>
+                  <td class="py-1.5 px-2">400</td>
+                </tr>
+              </tbody>
+              <tfoot class="bg-[var(--secondary)] text-[var(--secondary-foreground)] font-bold text-xs border-t-2 border-[var(--border)]">
+                <tr>
+                  <td class="py-2 px-1 border-r border-[var(--border)]">Σx=17</td>
+                  <td class="py-2 px-1 border-r border-[var(--border)]">Σy=51</td>
+                  <td class="py-2 px-1 border-r border-[var(--border)]">Σxy=243</td>
+                  <td class="py-2 px-1 border-r border-[var(--border)]">Σx²=81</td>
+                  <td class="py-2 px-1">Σy²=739</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="text-xs text-[var(--muted-foreground)] bg-[var(--card)] border border-[var(--border)] rounded-lg p-2.5">
+            La columna <code>y² (Σy² = 739)</code> se utiliza cuando también se calcula a mano el coeficiente de correlación de Pearson (<code>r = 0,94197874 ≈ 0,9420</code>). Para la recta <code>ŷ = a + bx</code> bastan las primeras cuatro sumas.
+          </div>
+        </div>
+
+        <!-- 2. PENDIENTE b + 3. ORDENADA a + 4. LA RECTA (7 cols) -->
+        <div class="lg:col-span-7 flex flex-col justify-between space-y-4">
+
+          <!-- Paso 2: Pendiente b -->
+          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-4 space-y-2">
+            <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#8f1d70]">
+              <span class="w-5 h-5 rounded u-btn-primary inline-flex items-center justify-center">2</span>
+              <span>Pendiente b</span>
+            </div>
+
+            <div class="overflow-x-auto py-1">
+              <div class="font-mono text-sm flex flex-wrap items-center gap-1.5">
+                <span class="font-bold text-base">b =</span>
+                <span class="math-frac">
+                  <span class="num">n·Σxy − Σx·Σy</span>
+                  <span class="den">n·Σx² − (Σx)²</span>
+                </span>
+                <span>=</span>
+                <span class="math-frac">
+                  <span class="num">4·243 − 17·51</span>
+                  <span class="den">4·81 − 17²</span>
+                </span>
+                <span>=</span>
+                <span class="math-frac">
+                  <span class="num">972 − 867</span>
+                  <span class="den">324 − 289</span>
+                </span>
+                <span>=</span>
+                <span class="math-frac">
+                  <span class="num">105</span>
+                  <span class="den">35</span>
+                </span>
+                <span class="px-2.5 py-1 rounded-lg u-btn-primary font-bold text-base ml-1">
+                  = 3
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Paso 3: Ordenada a -->
+          <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-4 space-y-2">
+            <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#8f1d70]">
+              <span class="w-5 h-5 rounded u-btn-primary inline-flex items-center justify-center">3</span>
+              <span>Ordenada al origen a (dos expresiones equivalentes)</span>
+            </div>
+
+            <div class="overflow-x-auto py-1 space-y-2">
+              <div class="font-mono text-sm flex flex-wrap items-center gap-1.5">
+                <span class="text-xs font-sans font-semibold text-[var(--muted-foreground)] mr-1">Con promedios:</span>
+                <span class="font-bold">a = ȳ − b·x̄ =</span>
+                <span class="math-frac"><span class="num">51</span><span class="den">4</span></span>
+                <span>− 3 ·</span>
+                <span class="math-frac"><span class="num">17</span><span class="den">4</span></span>
+                <span>= 12,75 − 12,75 =</span>
+                <span class="px-2 py-0.5 rounded u-btn-primary font-bold">0</span>
+              </div>
+              <div class="font-mono text-sm flex flex-wrap items-center gap-1.5 border-t border-[var(--border)] pt-1.5">
+                <span class="text-xs font-sans font-semibold text-[var(--muted-foreground)] mr-1">Con sumatorias:</span>
+                <span class="font-bold">a =</span>
+                <span class="math-frac"><span class="num">Σy − b·(Σx)</span><span class="den">n</span></span>
+                <span>=</span>
+                <span class="math-frac"><span class="num">51 − 3·(17)</span><span class="den">4</span></span>
+                <span>=</span>
+                <span class="math-frac"><span class="num">0</span><span class="den">4</span></span>
+                <span>=</span>
+                <span class="px-2 py-0.5 rounded u-btn-primary font-bold">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Paso 4: La Recta Final -->
+          <div class="bg-[var(--secondary)] text-[var(--secondary-foreground)] border border-[var(--border)] rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="space-y-0.5">
+              <div class="text-xs font-bold uppercase tracking-wider opacity-80">
+                4. Ecuación de la recta de regresión
+              </div>
+              <div class="text-xs opacity-90">
+                Sustituyendo <code>a = 0</code> y <code>b = 3</code> en <code>ŷ = a + b·x</code> (Opción <strong>d. y = 3x</strong>):
+              </div>
+            </div>
+            <div class="font-mono text-lg md:text-xl font-bold px-4 py-2 rounded-xl bg-[var(--card)] text-[var(--foreground)] border border-[var(--border)] shrink-0 text-center">
+              ŷ = 0 + 3x  ⇒  ŷ = 3x
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- POR QUÉ ESAS FÓRMULAS -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+        <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-4 space-y-1.5">
+          <div class="font-bold text-sm text-[var(--foreground)]">
+            ¿Por qué b tiene esa fórmula?
+          </div>
+          <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+            La recta de <strong>mínimos cuadrados</strong> hace mínima la suma de los errores al cuadrado (las distancias verticales entre cada punto y la recta). De ahí sale que <strong>b</strong> compara cuánto varían <code>x</code> e <code>y</code> juntas (numerador) contra cuánto varía <code>x</code> sola (denominador): es <em>"cuánto cambia y por cada unidad de x"</em>.
+          </p>
+        </div>
+
+        <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-4 space-y-1.5">
+          <div class="font-bold text-sm text-[var(--foreground)]">
+            ¿Por qué a = ȳ − b·x̄?
+          </div>
+          <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+            Matemáticamente, la recta de mínimos cuadrados <strong>siempre pasa por el punto de los promedios (x̄, ȳ)</strong>. Entonces, una vez que tenés la pendiente <code>b</code>, despejás <code>a</code> para obligar a que la recta pase por <code>(x̄, ȳ)</code>.
+          </p>
+        </div>
+
+        <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-4 space-y-1.5">
+          <div class="font-bold text-sm text-[var(--foreground)]">
+            Equivalencia entre cálculo manual y calculadora
+          </div>
+          <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+            En el modo de regresión lineal la calculadora acumula internamente las sumas y devuelve directo <strong>A (= a)</strong>, <strong>B (= b)</strong> y <strong>r</strong>. El procedimiento manual aplica exactamente las mismas fórmulas sobre esos totales acumulados.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- SECCIÓN 3: SIMULADOR DE PREDICCIONES (EJ. 11 Y CASO PRÁCTICO)         -->
+    <!-- ===================================================================== -->
+    <section id="sec-prediccion" class="bg-[var(--card)] border-2 u-accent-border rounded-2xl p-6 shadow-sm space-y-5">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 border-b border-[var(--border)] pb-4">
+        <div class="space-y-1">
+          <span class="inline-block px-2.5 py-0.5 rounded-md u-btn-primary text-xs font-bold uppercase tracking-wider">
+            3 · Simulador interactivo de predicciones
+          </span>
+          <h2 class="text-xl font-bold text-[var(--foreground)]">
+            Evaluación de modelos: Ejercicio 11 (Béisbol) y Caso Práctico (Horas de estudio)
+          </h2>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- CARD A: EJERCICIO 11 -->
+        <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-5 space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <span class="px-2.5 py-0.5 rounded u-pill text-xs font-bold">Ejercicio 11 · Liga de béisbol</span>
+            <span class="font-mono text-sm font-bold">ŷ = 159,62 − 0,10·x</span>
+          </div>
+          <p class="text-xs text-[var(--muted-foreground)]">
+            <code>x</code> = carreras permitidas · <code>y</code> = número predicho de victorias. Probá con <strong>x = 800</strong> o con <strong>x = 500</strong>:
+          </p>
+
+          <div class="flex flex-wrap gap-2">
+            <button data-click="setEx11Value(800)" class="px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--secondary)] text-xs font-mono font-bold">
+              Probar x = 800
+            </button>
+            <button data-click="setEx11Value(500)" class="px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--secondary)] text-xs font-mono font-bold">
+              Probar x = 500
+            </button>
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs font-mono">x =</span>
+              <input id="ex11-x-input" type="number" value="800" data-input="updateEx11Live()" class="px-2.5 py-1 rounded-lg border border-[var(--border)] bg-[var(--card)] font-mono text-xs w-24" />
+            </div>
+          </div>
+
+          <div id="ex11-live-box" class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-3.5 font-mono text-xs space-y-1"></div>
+
+          <!-- Interpretación del signo negativo -->
+          <div class="pt-2 border-t border-[var(--border)] space-y-2">
+            <div class="text-xs font-bold text-[var(--foreground)]">
+              Autoevaluación: ¿Qué indica el signo negativo de la pendiente (b = −0,10)?
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+              <button data-click="checkEx11Sign(false)" class="text-left px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--secondary)] transition">
+                A) Que al permitir más carreras, aumentan las victorias.
+              </button>
+              <button data-click="checkEx11Sign(true)" class="text-left px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--secondary)] transition">
+                B) Relación inversa: por cada carrera permitida adicional, las victorias disminuyen 0,10 en promedio.
+              </button>
+            </div>
+            <div id="ex11-sign-feedback" class="hidden text-xs rounded-lg p-2.5 border"></div>
+          </div>
+        </div>
+
+        <!-- CARD B: CASO PRÁCTICO KAGGLE -->
+        <div class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-5 space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <span class="px-2.5 py-0.5 rounded u-pill text-xs font-bold">Caso Práctico · Horas de estudio vs. Calificaciones</span>
+            <span class="font-mono text-sm font-bold">ŷ = 41,3935 + 4,9965·x</span>
+          </div>
+          <p class="text-xs text-[var(--muted-foreground)]">
+            <code>x</code> = horas de estudio dedicadas · <code>y</code> = calificación estimada (escala 0 a 100). Deslizá para estimar la calificación según la cantidad de horas:
+          </p>
+
+          <div class="space-y-2">
+            <div class="flex justify-between text-xs font-semibold">
+              <span>Horas de estudio (x): <strong id="kaggle-x-label" class="font-mono text-sm text-[#8f1d70]">6,00 h</strong></span>
+              <button data-click="setKaggleHours(6)" class="underline text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)]">Restablecer en x = 6 h</button>
+            </div>
+            <input id="kaggle-slider" type="range" min="0" max="10" step="0.25" value="6" data-input="updateKaggleLive()" class="w-full accent-[#8f1d70]" />
+            <div class="flex justify-between text-xs font-mono text-[var(--muted-foreground)]">
+              <span>0 h</span><span>2 h</span><span>4 h</span><span>6 h</span><span>8 h</span><span>10 h</span>
+            </div>
+          </div>
+
+          <div id="kaggle-live-box" class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-3.5 font-mono text-xs space-y-1"></div>
+
+          <div class="grid grid-cols-3 gap-2 text-center text-xs pt-1">
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-2">
+              <div class="text-[var(--muted-foreground)]">Pearson (r)</div>
+              <div class="font-mono font-bold text-sm">0,8320</div>
+            </div>
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-2">
+              <div class="text-[var(--muted-foreground)]">Determ. (R²)</div>
+              <div class="font-mono font-bold text-sm">69,22%</div>
+            </div>
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-2">
+              <div class="text-[var(--muted-foreground)]">Factores externos</div>
+              <div class="font-mono font-bold text-sm">30,78%</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- SECCIÓN 4: BANCO DE EJERCICIOS DEL TP N° 06                           -->
+    <!-- ===================================================================== -->
+    <section id="sec-tp6" class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm space-y-4">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 border-b border-[var(--border)] pb-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-[#8f1d70]">
+            4 · Banco de ejercicios del TP N° 06
+          </span>
+          <h2 class="text-xl font-bold text-[var(--foreground)]">
+            Resolución paso a paso de los 12 ejercicios de la guía
+          </h2>
+          <p class="text-xs text-[var(--muted-foreground)] mt-0.5">
+            Seleccioná cualquier ejercicio del 1 al 12 para consultar el enunciado, la respuesta correcta y la justificación analítica.
+          </p>
+        </div>
+      </div>
+
+      <!-- 12 Exercise Selector Buttons -->
+      <div class="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-12 gap-2" id="tp6-buttons"></div>
+
+      <!-- Selected Exercise Detail Box -->
+      <div id="tp6-detail-box" class="bg-[var(--background)] border border-[var(--border)] rounded-xl p-5 space-y-3"></div>
+    </section>
+
+  </div>
+
+  <script src="js/datos.js" defer></script>
+  <script src="js/app.js" defer></script>
+</body>
+</html>
