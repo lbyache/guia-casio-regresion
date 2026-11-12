@@ -882,7 +882,17 @@
       button.setAttribute('aria-pressed', String(dark));
       button.setAttribute('aria-label', label);
       document.getElementById('theme-toggle-label').textContent = label;
-      localStorage.setItem('guia-casio-theme', dark ? 'dark' : 'light');
+      try {
+        localStorage.setItem('guia-casio-theme', dark ? 'dark' : 'light');
+      } catch {}
+    }
+
+    function getStoredTheme() {
+      try {
+        return localStorage.getItem('guia-casio-theme');
+      } catch {
+        return null;
+      }
     }
 
     function toggleTheme() {
@@ -1114,7 +1124,7 @@
     }
 
     selectModel('classwiz');
-    setTheme(localStorage.getItem('guia-casio-theme') === 'dark' ? 'dark' : 'light');
+    setTheme(getStoredTheme() === 'dark' ? 'dark' : 'light');
     updateEx11Live();
     updateKaggleLive();
     buildTp6Bank();
