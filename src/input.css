@@ -99,6 +99,10 @@
       border: 2px solid #334155;
       box-shadow: inset 0 2px 4px rgba(0,0,0,0.18);
     }
+    /* The dynamic step template is not seen by Tailwind's class scanner. */
+    @media (min-width: 640px) {
+      .mini-lcd { width: 11rem; }
+    }
     .cw-key {
       position: relative;
       transition: all 0.18s ease;
