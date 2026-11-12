@@ -856,19 +856,27 @@
     }
 
     function printSummary() {
-      const model = getModelsData(datasets[currentDataset])[currentModel];
+      const dataset = datasets[currentDataset];
+      const model = getModelsData(dataset)[currentModel];
       const route = goals[currentGoal].steps.map(step => step === 'sums' ? model.steps.sums : model.steps[step]);
       const routeHtml = route.map(step => {
         const keys = step.pills.map(key => `<span class="print-key">${key}</span>`).join(' → ');
-        return `<li><strong>${step.title}:</strong> ${keys}</li>`;
+        return `<li><strong>${step.title}:</strong> ${keys}<span class="print-step-note">${step.desc.replace(/<[^>]*>/g, '')}</span></li>`;
       }).join('');
+      const dataRowsHtml = dataset.rows.map(row => `<tr><td>${row.idx}</td><td>${row.x}</td><td>${row.y}</td></tr>`).join('');
+      const dataNote = dataset.rows.length === dataset.n
+        ? 'Cargá cada par en el orden indicado.'
+        : `La guía muestra ${dataset.rows.length} pares de referencia de un conjunto de ${dataset.n}. Para replicar el resultado completo, cargá los ${dataset.n} pares de la actividad.`;
+      const equation = dataset.a === '0' ? `ŷ = ${dataset.b}x` : `ŷ = ${dataset.a} + ${dataset.b}x`;
       document.getElementById('print-summary').innerHTML = `
-        <header class="print-header"><p>Guía de estudio · correlación y regresión lineal</p><h1>Ruta rápida Casio</h1></header>
+        <header class="print-header"><p>Guía de estudio · correlación y regresión lineal</p><h1>Hoja de ruta Casio</h1><span>Para usar junto a tu calculadora</span></header>
         <main class="print-body">
-          <div class="print-meta"><p><strong>Modelo</strong><br>${model.modelLabel}</p><p><strong>Datos</strong><br>${datasets[currentDataset].name}</p><p><strong>Objetivo</strong><br>${goals[currentGoal].label}</p></div>
-          <h2>Ruta de teclas</h2><ol class="print-route">${routeHtml}</ol>
-          <div class="print-result"><h2>Resultado para comparar</h2><p>${goals[currentGoal].result(datasets[currentDataset])}</p></div>
-          <p>Guiate por el nombre de cada opción que aparezca en la pantalla de tu calculadora: los números pueden variar entre variantes de una misma familia.</p>
+          <div class="print-meta"><p><strong>Modelo elegido</strong><br>${model.modelLabel}</p><p><strong>Conjunto de datos</strong><br>${dataset.name}</p><p><strong>Objetivo</strong><br>${goals[currentGoal].label}</p></div>
+          <section class="print-section print-start"><h2>Antes de empezar</h2><p>${model.headerDesc}</p><ul class="print-checklist"><li>Confirmé que mi calculadora pertenece a esta familia.</li><li>Seleccioné regresión lineal de dos variables.</li><li>Voy a cargar cada par x, y en el mismo orden.</li></ul></section>
+          <section class="print-section"><h2>Ruta de teclas</h2><ol class="print-route">${routeHtml}</ol></section>
+          <section class="print-section print-results"><h2>Valores para comparar</h2><table><tbody><tr><th>Recta</th><td>${equation}</td></tr><tr><th>Correlación</th><td>r = ${dataset.rShort}</td></tr><tr><th>Determinación</th><td>R² = ${dataset.r2}</td></tr><tr><th>Sumatorias</th><td>Σx = ${dataset.sx} · Σy = ${dataset.sy} · Σxy = ${dataset.sxy}</td></tr></tbody></table><p>${goals[currentGoal].result(dataset)}</p></section>
+          <section class="print-section"><h2>Datos de referencia</h2><p class="print-note">${dataNote}</p><table class="print-data"><thead><tr><th>Par</th><th>x</th><th>y</th></tr></thead><tbody>${dataRowsHtml}</tbody></table></section>
+          <footer class="print-footer">Seguí el nombre que aparezca en la pantalla de tu calculadora: los números de menú pueden variar entre variantes de una misma familia.</footer>
         </main>
       `;
       window.print();
