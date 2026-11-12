@@ -1,4 +1,3 @@
-// Interacciones de la infografía.
     const allKeyIds = [
       'key-shift', 'key-alpha', 'key-optn', 'key-comma',
       'key-menu', 'key-on', 'key-x2', 'key-mplus',
@@ -812,7 +811,6 @@
       selectStep(prev);
     }
 
-    // LIVE PREDICTION LABS (EJ 11 & KAGGLE)
     function setEx11Value(val) {
       document.getElementById('ex11-x-input').value = val;
       updateEx11Live();
@@ -865,9 +863,6 @@
       `;
     }
 
-    // =====================================================================
-    // BANCO DE LOS 12 EJERCICIOS DEL TP6 (TONO AGNÓSTICO DE MANUAL)
-    // =====================================================================
     const tp6Exercises = {
       1: {
         title: "Ejercicio 1 · Gráfico de dispersión ascendente",
@@ -980,13 +975,11 @@
       `;
     }
 
-    // Initialize everything
     selectModel('classwiz');
     updateEx11Live();
     updateKaggleLive();
     buildTp6Bank();
 
-// Delegación de eventos: incluye controles creados dinámicamente.
 const actions = { selectDataset, selectModel, selectStep, selectTp6, nextStep, prevStep,
   showSumsInLCD, setEx11Value, checkEx11Sign, setKaggleHours, updateEx11Live, updateKaggleLive };
 function runAction(element, name) {

@@ -1,4 +1,3 @@
-// Datos de los ejemplos incluidos en la infografía.
     const datasets = {
       ej12: {
         name: "Ejercicio 12 (n = 4)",
