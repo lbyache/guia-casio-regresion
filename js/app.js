@@ -8,6 +8,45 @@
     let currentDataset = 'ej12';
     let currentModel = 'classwiz';
     let currentStep = 1;
+    let currentGoal = 'regression';
+
+    const goals = {
+      regression: {
+        label: 'Obtené la recta de regresión: a y b',
+        copy: 'Intentalo primero con tu calculadora. Cuando quieras, pedí una pista.',
+        hint: 'Primero entrá a Estadística, elegí el modelo lineal y cargá todos los pares (x, y).',
+        steps: [1, 2, 3, 4],
+        result: ds => `Compará con la guía: a = <strong>${ds.a}</strong> y b = <strong>${ds.b}</strong>. La recta es ŷ = ${ds.a === '0' ? '' : `${ds.a} + `}${ds.b}x.`
+      },
+      r: {
+        label: 'Obtené el coeficiente de correlación r',
+        copy: 'Buscá el resultado de Pearson después de cargar los datos.',
+        hint: 'La ruta para r es la misma que para la regresión lineal: primero configurá la tabla y después buscá el resultado de regresión.',
+        steps: [1, 2, 3, 4],
+        result: ds => `El valor esperado es <strong>r = ${ds.rShort}</strong> (la calculadora puede mostrar más decimales).`
+      },
+      r2: {
+        label: 'Calculá el coeficiente de determinación R²',
+        copy: 'Primero obtené r; después elevá ese valor al cuadrado.',
+        hint: 'R² no suele aparecer junto con a, b y r. Conservá r en pantalla o anotado para elevarlo al cuadrado.',
+        steps: [1, 2, 3, 4, 5],
+        result: ds => `Con r = ${ds.rShort}, el resultado esperado es <strong>R² = ${ds.r2}</strong>.`
+      },
+      sums: {
+        label: 'Verificá las sumatorias intermedias',
+        copy: 'Cargá los pares y consultá las sumas que usa la calculadora internamente.',
+        hint: 'Necesitás entrar al modo de dos variables o a la opción Sum, según la familia de tu Casio.',
+        steps: [1, 2, 3, 'sums'],
+        result: ds => `Compará Σx = <strong>${ds.sx}</strong>, Σy = <strong>${ds.sy}</strong> y Σxy = <strong>${ds.sxy}</strong>.`
+      },
+      prediction: {
+        label: 'Prepará una predicción con la recta',
+        copy: 'Obtené a y b; luego usá el simulador para reemplazar el valor de x.',
+        hint: 'La predicción sale de ŷ = a + b·x. Primero necesitás obtener la recta en tu calculadora.',
+        steps: [1, 2, 3, 4],
+        result: ds => `Con la recta obtenida, seguí en el simulador de predicciones. Para estos datos: <strong>ŷ = ${ds.a === '0' ? '' : `${ds.a} + `}${ds.b}x</strong>.`
+      }
+    };
 
     function getModelsData(ds) {
       const tableRowsHtml = ds.rows.map((r, i) => `
@@ -636,6 +675,7 @@
       document.getElementById('active-dataset-pill').textContent = 'Datos activos: ' + datasets[dsKey].name;
       buildStepsList(currentModel);
       selectStep(currentStep);
+      updatePracticePanel();
     }
 
     function buildStepsList(modelKey) {
@@ -694,6 +734,7 @@
       `;
 
       container.innerHTML = html;
+      applyGoalFilter();
     }
 
     function updateCalculatorAppearance(modelKey) {
@@ -749,6 +790,96 @@
       updateCalculatorAppearance(modelKey);
       buildStepsList(modelKey);
       selectStep(1);
+      updatePracticePanel();
+    }
+
+    function applyGoalFilter() {
+      const allowed = new Set(goals[currentGoal].steps);
+      for (let i = 1; i <= 5; i++) {
+        const card = document.getElementById('step-card-' + i);
+        if (card) card.classList.toggle('goal-hidden', !allowed.has(i));
+      }
+      const sumsCard = document.getElementById('step-card-sums');
+      if (sumsCard) sumsCard.classList.toggle('goal-hidden', !allowed.has('sums'));
+    }
+
+    function updatePracticePanel() {
+      const goal = goals[currentGoal];
+      const model = getModelsData(datasets[currentDataset])[currentModel];
+      Object.keys(goals).forEach(key => {
+        const button = document.getElementById('goal-' + key);
+        if (button) button.classList.toggle('is-selected', key === currentGoal);
+      });
+      document.getElementById('practice-mission-title').textContent = goal.label;
+      document.getElementById('practice-mission-copy').textContent = goal.copy;
+      document.getElementById('compatibility-note').innerHTML = `<strong>Modelo seleccionado:</strong> ${model.modelLabel}. Las rutas son orientativas para esta familia; seguí el nombre que aparezca en la pantalla de tu calculadora.`;
+    }
+
+    function selectGoal(goalKey) {
+      currentGoal = goalKey;
+      updatePracticePanel();
+      buildStepsList(currentModel);
+      selectStep(1);
+      const feedback = document.getElementById('practice-feedback');
+      feedback.hidden = true;
+      feedback.innerHTML = '';
+    }
+
+    function setPracticeFeedback(html) {
+      const feedback = document.getElementById('practice-feedback');
+      feedback.hidden = false;
+      feedback.innerHTML = html;
+    }
+
+    function showPracticeHint() {
+      setPracticeFeedback(`<strong>Pista:</strong> ${goals[currentGoal].hint}`);
+    }
+
+    function showPracticeMenu() {
+      const model = getModelsData(datasets[currentDataset])[currentModel];
+      const route = goals[currentGoal].steps.filter(step => step !== 'sums');
+      const firstAction = model.steps[route[0]].pills.join(' → ');
+      setPracticeFeedback(`<strong>Buscá primero:</strong> ${firstAction}. Después seguí los pasos visibles de la guía para <strong>${goals[currentGoal].label.toLowerCase()}</strong>.`);
+    }
+
+    function revealPractice() {
+      const model = getModelsData(datasets[currentDataset])[currentModel];
+      const route = goals[currentGoal].steps.map(step => step === 'sums' ? model.steps.sums : model.steps[step]);
+      const routeHtml = route.map((step, index) => `<li><strong>${index + 1}. ${step.title}:</strong> ${step.pills.join(' → ')}</li>`).join('');
+      setPracticeFeedback(`<strong>Ruta completa:</strong><ol>${routeHtml}</ol><p>${goals[currentGoal].result(datasets[currentDataset])}</p>`);
+    }
+
+    function resetGuide() {
+      selectStep(1);
+      document.getElementById('sec-calculadora').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setPracticeFeedback('<strong>Volvimos al paso 1.</strong> Revisá el nombre del menú en la pantalla de tu modelo y seguí los pasos visibles.');
+    }
+
+    function printSummary() {
+      const model = getModelsData(datasets[currentDataset])[currentModel];
+      const route = goals[currentGoal].steps.map(step => step === 'sums' ? model.steps.sums : model.steps[step]);
+      const routeHtml = route.map(step => `<li><strong>${step.title}:</strong> ${step.pills.join(' → ')}</li>`).join('');
+      document.getElementById('print-summary').innerHTML = `
+        <h1>Guía Casio: correlación y regresión lineal</h1>
+        <div class="print-meta"><p><strong>Modelo:</strong> ${model.modelLabel}<br><strong>Datos:</strong> ${datasets[currentDataset].name}<br><strong>Objetivo:</strong> ${goals[currentGoal].label}</p></div>
+        <h2>Ruta de teclas</h2><ol>${routeHtml}</ol>
+        <h2>Resultado para comparar</h2><p>${goals[currentGoal].result(datasets[currentDataset])}</p>
+        <p>Guiate por el nombre de cada opción que aparezca en la pantalla de tu calculadora: los números pueden variar entre variantes de una misma familia.</p>
+      `;
+      window.print();
+    }
+
+    function setTheme(theme) {
+      const dark = theme === 'dark';
+      document.body.classList.toggle('theme-dark', dark);
+      const button = document.getElementById('theme-toggle');
+      button.textContent = dark ? 'Modo claro' : 'Modo oscuro';
+      button.setAttribute('aria-pressed', String(dark));
+      localStorage.setItem('guia-casio-theme', dark ? 'dark' : 'light');
+    }
+
+    function toggleTheme() {
+      setTheme(document.body.classList.contains('theme-dark') ? 'light' : 'dark');
     }
 
     function highlightKeys(activeKeys) {
@@ -976,12 +1107,14 @@
     }
 
     selectModel('classwiz');
+    setTheme(localStorage.getItem('guia-casio-theme') === 'dark' ? 'dark' : 'light');
     updateEx11Live();
     updateKaggleLive();
     buildTp6Bank();
 
 const actions = { selectDataset, selectModel, selectStep, selectTp6, nextStep, prevStep,
-  showSumsInLCD, setEx11Value, checkEx11Sign, setKaggleHours, updateEx11Live, updateKaggleLive };
+  showSumsInLCD, setEx11Value, checkEx11Sign, setKaggleHours, updateEx11Live, updateKaggleLive,
+  selectGoal, showPracticeHint, showPracticeMenu, revealPractice, resetGuide, printSummary, toggleTheme };
 function runAction(element, name) {
   const match = element.dataset[name]?.match(/^(\w+)\((.*)\)$/);
   if (!match || !Object.hasOwn(actions, match[1])) return;

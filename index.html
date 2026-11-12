@@ -4,9 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Guía interactiva de correlación y regresión lineal</title>
-  <link rel="stylesheet" href="css/styles.css?v=20261112-vanilla">
+  <link rel="stylesheet" href="css/styles.css?v=20261112-practica">
 </head>
 <body class="bg-[var(--background)] text-[var(--foreground)] antialiased p-4 md:p-8">
+  <aside id="print-summary" aria-hidden="true"></aside>
 
   <div class="max-w-6xl mx-auto space-y-8">
 
@@ -25,9 +26,11 @@
       <div class="p-5 space-y-4">
         <div class="flex flex-wrap gap-2 pb-4 border-b border-[var(--border)] text-xs">
             <a href="#sec-calculadora" class="px-3 py-1 rounded-lg bg-[var(--secondary)] text-[var(--secondary-foreground)] font-semibold hover:opacity-90">1. Uso de Calculadora</a>
+            <a href="#sec-practica" class="px-3 py-1 rounded-lg bg-[var(--secondary)] text-[var(--secondary-foreground)] font-semibold hover:opacity-90">Modo práctica</a>
             <a href="#sec-manual" class="px-3 py-1 rounded-lg bg-[var(--secondary)] text-[var(--secondary-foreground)] font-semibold hover:opacity-90">2. Desarrollo Manual (Ej. 12)</a>
             <a href="#sec-prediccion" class="px-3 py-1 rounded-lg bg-[var(--secondary)] text-[var(--secondary-foreground)] font-semibold hover:opacity-90">3. Simulador de Predicciones</a>
             <a href="#sec-tp6" class="px-3 py-1 rounded-lg bg-[var(--secondary)] text-[var(--secondary-foreground)] font-semibold hover:opacity-90">4. Banco de Ejercicios TP N° 06</a>
+            <button id="theme-toggle" data-click="toggleTheme()" class="px-3 py-1 rounded-lg bg-[var(--secondary)] text-[var(--secondary-foreground)] font-semibold hover:opacity-90" aria-pressed="false">Modo oscuro</button>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
@@ -73,6 +76,44 @@
         </div>
       </div>
     </header>
+
+    <section id="sec-practica" class="practice-panel bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm">
+      <div class="practice-heading">
+        <span class="text-xs font-bold uppercase tracking-wider text-[#8f1d70]">Practicá con tu calculadora</span>
+        <h2 class="text-lg md:text-xl font-bold">Elegí qué querés obtener</h2>
+        <p class="text-xs text-[var(--muted-foreground)]">El modelo y los datos que seleccionaste arriba se usan en esta práctica.</p>
+      </div>
+
+      <div class="practice-goals" role="group" aria-label="Objetivo de práctica">
+        <button id="goal-regression" data-click="selectGoal('regression')" class="practice-goal is-selected">Recta (a y b)</button>
+        <button id="goal-r" data-click="selectGoal('r')" class="practice-goal">Correlación r</button>
+        <button id="goal-r2" data-click="selectGoal('r2')" class="practice-goal">Coeficiente R²</button>
+        <button id="goal-sums" data-click="selectGoal('sums')" class="practice-goal">Sumatorias</button>
+        <button id="goal-prediction" data-click="selectGoal('prediction')" class="practice-goal">Predicción</button>
+      </div>
+
+      <div class="practice-mission" aria-live="polite">
+        <div>
+          <span class="practice-kicker">Misión</span>
+          <h3 id="practice-mission-title">Obtené la recta de regresión: a y b</h3>
+          <p id="practice-mission-copy">Intentalo primero con tu calculadora. Cuando quieras, pedí una pista.</p>
+        </div>
+        <div class="practice-actions">
+          <button data-click="showPracticeHint()" class="practice-action">1. Dar una pista</button>
+          <button data-click="showPracticeMenu()" class="practice-action">2. Ver el menú</button>
+          <button data-click="revealPractice()" class="practice-action practice-action-primary">3. Revelar ruta</button>
+        </div>
+        <div id="practice-feedback" class="practice-feedback" hidden></div>
+      </div>
+
+      <div class="practice-tools">
+        <p id="compatibility-note" class="compatibility-note"></p>
+        <div class="practice-tool-buttons">
+          <button data-click="resetGuide()" class="practice-link-button">Estoy perdido: volver al paso 1</button>
+          <button data-click="printSummary()" class="practice-link-button">Imprimir resumen de este modelo</button>
+        </div>
+      </div>
+    </section>
 
     <div id="sec-calculadora" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
@@ -610,7 +651,7 @@
 
   </div>
 
-  <script src="js/datos.js" defer></script>
-  <script src="js/app.js" defer></script>
+  <script src="js/datos.js?v=20261112-practica" defer></script>
+  <script src="js/app.js?v=20261112-practica" defer></script>
 </body>
 </html>
