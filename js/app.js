@@ -858,13 +858,18 @@
     function printSummary() {
       const model = getModelsData(datasets[currentDataset])[currentModel];
       const route = goals[currentGoal].steps.map(step => step === 'sums' ? model.steps.sums : model.steps[step]);
-      const routeHtml = route.map(step => `<li><strong>${step.title}:</strong> ${step.pills.join(' → ')}</li>`).join('');
+      const routeHtml = route.map(step => {
+        const keys = step.pills.map(key => `<span class="print-key">${key}</span>`).join(' → ');
+        return `<li><strong>${step.title}:</strong> ${keys}</li>`;
+      }).join('');
       document.getElementById('print-summary').innerHTML = `
-        <h1>Guía Casio: correlación y regresión lineal</h1>
-        <div class="print-meta"><p><strong>Modelo:</strong> ${model.modelLabel}<br><strong>Datos:</strong> ${datasets[currentDataset].name}<br><strong>Objetivo:</strong> ${goals[currentGoal].label}</p></div>
-        <h2>Ruta de teclas</h2><ol>${routeHtml}</ol>
-        <h2>Resultado para comparar</h2><p>${goals[currentGoal].result(datasets[currentDataset])}</p>
-        <p>Guiate por el nombre de cada opción que aparezca en la pantalla de tu calculadora: los números pueden variar entre variantes de una misma familia.</p>
+        <header class="print-header"><p>Guía de estudio · correlación y regresión lineal</p><h1>Ruta rápida Casio</h1></header>
+        <main class="print-body">
+          <div class="print-meta"><p><strong>Modelo</strong><br>${model.modelLabel}</p><p><strong>Datos</strong><br>${datasets[currentDataset].name}</p><p><strong>Objetivo</strong><br>${goals[currentGoal].label}</p></div>
+          <h2>Ruta de teclas</h2><ol class="print-route">${routeHtml}</ol>
+          <div class="print-result"><h2>Resultado para comparar</h2><p>${goals[currentGoal].result(datasets[currentDataset])}</p></div>
+          <p>Guiate por el nombre de cada opción que aparezca en la pantalla de tu calculadora: los números pueden variar entre variantes de una misma familia.</p>
+        </main>
       `;
       window.print();
     }
@@ -873,8 +878,10 @@
       const dark = theme === 'dark';
       document.body.classList.toggle('theme-dark', dark);
       const button = document.getElementById('theme-toggle');
-      button.textContent = dark ? 'Modo claro' : 'Modo oscuro';
+      const label = dark ? 'Activar modo claro' : 'Activar modo oscuro';
       button.setAttribute('aria-pressed', String(dark));
+      button.setAttribute('aria-label', label);
+      document.getElementById('theme-toggle-label').textContent = label;
       localStorage.setItem('guia-casio-theme', dark ? 'dark' : 'light');
     }
 
